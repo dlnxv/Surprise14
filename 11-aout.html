@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Une lettre pour toi 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,500&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF7F1;
+    --cream-deep:#FBEDE3;
+    --berry:#A63A50;
+    --berry-soft:#C97B84;
+    --mint:#6FAE9A;
+    --ink:#3A2E2E;
+    --gold:#D9A441;
+    --wax:#8C2F3E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:radial-gradient(circle at 20% 10%, var(--cream-deep), var(--cream) 60%);
+    font-family:'Quicksand', sans-serif;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow-x:hidden;
+    padding:24px;
+  }
+  .stage{
+    width:100%;
+    max-width:440px;
+    text-align:center;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:1.7rem;
+    color:var(--berry);
+    margin:0 0 6px;
+    line-height:1.3;
+  }
+  p.sub{
+    font-size:1rem;
+    color:#6b5a5a;
+    margin:0 0 34px;
+  }
+
+  /* --- Enveloppe --- */
+  .envelope-wrap{
+    position:relative;
+    width:280px;
+    height:190px;
+    margin:0 auto;
+    cursor:pointer;
+  }
+  .envelope-wrap.opened{ cursor:default; }
+
+  .envelope-body{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(160deg, #fffdfa, var(--cream-deep));
+    border-radius:10px;
+    box-shadow:0 14px 30px rgba(0,0,0,.12);
+    overflow:hidden;
+  }
+  .envelope-body::before{
+    /* pli triangulaire gauche */
+    content:"";
+    position:absolute;
+    left:0; top:0;
+    width:0; height:0;
+    border-style:solid;
+    border-width:95px 0 95px 140px;
+    border-color:transparent transparent transparent var(--cream-deep);
+    opacity:.6;
+  }
+  .envelope-body::after{
+    /* pli triangulaire droit */
+    content:"";
+    position:absolute;
+    right:0; top:0;
+    width:0; height:0;
+    border-style:solid;
+    border-width:95px 140px 95px 0;
+    border-color:transparent var(--cream-deep) transparent transparent;
+    opacity:.6;
+  }
+
+  .flap{
+    position:absolute;
+    top:0; left:0;
+    width:100%;
+    height:0;
+    border-style:solid;
+    border-width:100px 140px 0 140px;
+    border-color:var(--berry-soft) transparent transparent transparent;
+    transform-origin:top center;
+    transition:transform .7s cubic-bezier(.4,0,.2,1);
+    z-index:5;
+  }
+  .envelope-wrap.opened .flap{
+    transform:rotateX(180deg);
+  }
+
+  .wax-seal{
+    position:absolute;
+    top:66px;
+    left:50%;
+    transform:translateX(-50%);
+    width:46px;
+    height:46px;
+    background:radial-gradient(circle at 35% 30%, #b23a4d, var(--wax));
+    border-radius:50%;
+    box-shadow:0 4px 8px rgba(0,0,0,.25);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#f4d9b0;
+    font-size:1.2rem;
+    font-family:'Fraunces', serif;
+    z-index:6;
+    transition:opacity .3s ease, transform .3s ease;
+  }
+  .envelope-wrap.opened .wax-seal{
+    opacity:0;
+    transform:translateX(-50%) scale(0.4) rotate(25deg);
+    pointer-events:none;
+  }
+
+  .letter{
+    position:absolute;
+    left:14px;
+    right:14px;
+    bottom:10px;
+    top:60px;
+    background:#fffaf4;
+    border-radius:6px;
+    box-shadow:0 4px 14px rgba(0,0,0,.1);
+    transform:translateY(0);
+    transition:transform .8s cubic-bezier(.4,0,.2,1) .1s;
+    z-index:2;
+  }
+  .envelope-wrap.opened .letter{
+    transform:translateY(-230px) scale(1.02);
+  }
+
+  .tap-hint{
+    margin-top:20px;
+    font-size:.88rem;
+    color:var(--berry-soft);
+    font-weight:600;
+  }
+  .envelope-wrap.opened ~ .tap-hint{ opacity:0; }
+
+  /* --- Carte lettre affichée --- */
+  .letter-card{
+    display:none;
+    background:#fffaf4;
+    border-radius:18px;
+    padding:30px 26px;
+    margin-top:26px;
+    box-shadow:0 14px 34px rgba(0,0,0,.1);
+    text-align:left;
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:1.08rem;
+    line-height:1.75;
+    color:var(--ink);
+  }
+  .letter-card.show{
+    display:block;
+    animation:fadeIn .7s ease;
+  }
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .letter-card .signature{
+    margin-top:18px;
+    text-align:right;
+    font-weight:600;
+    font-style:normal;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <h1 id="titleText">Une lettre t'attend 💌</h1>
+  <p class="sub" id="subText">Clique sur l'enveloppe pour l'ouvrir</p>
+
+  <div class="envelope-wrap" id="envelope">
+    <div class="letter"></div>
+    <div class="envelope-body"></div>
+    <div class="wax-seal">D</div>
+    <div class="flap"></div>
+  </div>
+
+  <div class="letter-card" id="letterCard">
+    <p>Coucou toi,</p>
+    <p>Ça fait quelques jours qu'on est chacun de notre côté, et je voulais juste prendre deux minutes pour te dire que tu me manques déjà un peu (beaucoup).</p>
+    <p>J'espère que tes vacances sont exactement ce dont t'avais besoin : du soleil, du repos, et plein de bons moments à me raconter au retour.</p>
+    <p>À bientôt mon soleil,</p>
+    <p class="signature">Dilian 🤍</p>
+  </div>
+</div>
+
+<script>
+  const envelope = document.getElementById('envelope');
+  const letterCard = document.getElementById('letterCard');
+  const titleText = document.getElementById('titleText');
+  const subText = document.getElementById('subText');
+  let opened = false;
+
+  envelope.addEventListener('click', function(){
+    if(opened) return;
+    opened = true;
+    envelope.classList.add('opened');
+    titleText.textContent = 'Pour toi 🤍';
+    subText.textContent = '';
+    setTimeout(() => {
+      letterCard.classList.add('show');
+    }, 500);
+  });
+</script>
+
+</body>
+</html>
